@@ -29,6 +29,7 @@ class Java_Lexer:
     def __tokenize_src(self):
         for line in self.src_lines:
             self.__pointer["ln"] += 1
+            self.last_position = 0
             for match in self.__tokenization_pattern.finditer(line):
                 for key, value in match.groupdict().items():
                     if value is not None:
@@ -37,7 +38,10 @@ class Java_Lexer:
                         self.__append_row(key, value)
 
     def __update_col(self, line, token):
-        self.__pointer["col"] = self.raw_src[line].find(token) + 1
+        self.__pointer["col"] = (
+            self.raw_src[line].find(token, self.last_position) + 1
+        )
+        self.last_position = self.__pointer["col"]
 
     def __update_block(self, token):
         if token == "{":
